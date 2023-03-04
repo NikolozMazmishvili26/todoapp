@@ -1,112 +1,178 @@
 import styled from "styled-components";
+import { motion } from "framer-motion";
 
 // import assets
-import deleteImage from "../../assets/delete.png";
+import delIcon from "../../assets/icon-cross.svg";
 import completed from "../../assets/completed.png";
 
-// interfaces
-import { TodosInterface } from "../Create Todo Input Component/Input";
+// imported interface
+import { TodosProps } from "../Create Todo Input Component/CreateTodoInput";
 
-interface ListProps {
-  todo: TodosInterface;
-  todos: TodosInterface[];
-  setTodos: React.Dispatch<React.SetStateAction<TodosInterface[]>>;
+interface TodoListProps {
+  todo: TodosProps;
+  todos: TodosProps[];
+  setTodos: React.Dispatch<React.SetStateAction<TodosProps[]>>;
+  isDarkMode: boolean;
 }
 
-function List({ todo, todos, setTodos }: ListProps) {
-  const { id, todosValue, isCompleted } = todo;
+function TodoList({ todo, todos, setTodos, isDarkMode }: TodoListProps) {
+  const { id, todoValue, isCompleted } = todo;
 
   // delete function
-  const handleDelete = (id: string) => {
+
+  const handleDelete = () => {
     const deleteItem = todos.filter((todo) => todo.id !== id);
     setTodos(deleteItem);
   };
 
-  // update is complete function
-  const handleUpdateIsComplete = (id: string) => {
-    const updateComplete = todos.map((todo) => {
+  // complete switcher function
+
+  const handleCompleteSwitcher = () => {
+    const updateIsComplete = todos.map((todo) => {
       if (todo.id === id) {
         return { ...todo, isCompleted: !isCompleted };
       }
       return todo;
     });
-    setTodos(updateComplete);
+    setTodos(updateIsComplete);
   };
 
   return (
-    <TodoList>
-      <TodoContent>
+    <TodoContent
+      isDarkMode={isDarkMode}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+    >
+      <TodoItem>
+        {/* left side */}
         <LeftSide>
-          <TodoCompletedBox
-            onClick={() => handleUpdateIsComplete(id)}
+          <TodoCircleSwitcher
+            onClick={handleCompleteSwitcher}
             isCompleted={isCompleted}
+            // props
+            isDarkMode={isDarkMode}
           />
-          <TodosValue isCompleted={isCompleted}>{todosValue}</TodosValue>
+          <TodoValue isCompleted={isCompleted} isDarkMode={isDarkMode}>
+            {todoValue}
+          </TodoValue>
         </LeftSide>
-
+        {/* right side */}
         <RightSide>
-          <DeleteImage
-            src={deleteImage}
-            alt="delete"
-            onClick={() => handleDelete(id)}
-          />
+          <DeleteImage src={delIcon} alt="deleteImage" onClick={handleDelete} />
         </RightSide>
-      </TodoContent>
-    </TodoList>
+      </TodoItem>
+    </TodoContent>
   );
 }
 
-export default List;
+export default TodoList;
 
-const TodoList = styled.div`
-  padding: 16px 20px 0px 20px;
+const TodoContent = styled(motion.div)<{ isDarkMode: boolean }>`
   &::after {
     content: "";
     width: 100%;
     height: 1px;
-    background-color: #e3e4f1;
+    background-color: ${(props) =>
+      props.isDarkMode ? "#393A4B" : "var(--very-light-grayish-blue)"};
     display: block;
     margin-top: 16px;
+
+    @media screen and (min-width: 700px) {
+      margin-top: 19px;
+    }
   }
 `;
 
-const TodoContent = styled.div`
+// item styles
+
+const TodoItem = styled.div`
+  padding: 16px 20px 0px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+
+  @media screen and (min-width: 700px) {
+    padding: 20px 24px 0px 24px;
+  }
 `;
 
-// left sidestyles
+// left side styles
+
 const LeftSide = styled.div`
   display: flex;
   align-items: center;
   column-gap: 12px;
+
+  @media screen and (min-width: 700px) {
+    column-gap: 24px;
+  }
 `;
 
-const TodoCompletedBox = styled.div<{ isCompleted: boolean }>`
+const TodoCircleSwitcher = styled.div<{
+  isCompleted: boolean;
+  isDarkMode: boolean;
+}>`
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  border: 2px solid rgba(194, 195, 214, 0.5);
+  border: 1px solid var(--light-grayish-blue);
+  border: ${(props) =>
+    props.isDarkMode
+      ? "1px solid var(--very-dark-grayish-blue)"
+      : "1px solid var(--light-grayish-blue)"};
   background-image: url(${(props) => props.isCompleted && completed});
   background-position: center;
-  background-repeat: no-repeat;
+  background-size: cover;
+  cursor: pointer;
+
+  @media screen and (min-width: 700px) {
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+  }
 `;
 
-const TodosValue = styled.p<{ isCompleted: boolean }>`
+const TodoValue = styled.p<{ isCompleted: boolean; isDarkMode: boolean }>`
   font-style: normal;
   font-weight: 400;
   font-size: 12px;
   line-height: 12px;
-  color: ${(props) => props.isCompleted && "#D1D2DA"};
-  text-decoration: ${(props) => props.isCompleted && `line-through`};
-  word-wrap: break-word;
-  max-width: 230px;
+  letter-spacing: -0.166667px;
+  color: ${(props) =>
+    props.isDarkMode
+      ? "var(--light-grayish-blue)"
+      : "var(--very-dark-grayish-blue)"};
+
+   {
+    ${(props) =>
+      props.isDarkMode && props.isCompleted
+        ? "color : var(--very-dark-grayish-blue)"
+        : !props.isDarkMode &&
+          props.isCompleted &&
+          "color : var(--light-grayish-blue)"}
+  }
+
+  text-decoration: ${(props) => props.isCompleted && "line-through"};
+
+  @media screen and (min-width: 700px) {
+    font-size: 18px;
+    line-height: 18px;
+    letter-spacing: -0.25px;
+  }
 `;
 
 // right side styles
+
 const RightSide = styled.div``;
 
 const DeleteImage = styled.img`
   cursor: pointer;
+  width: 12px;
+  height: 12px;
+
+  @media screen and (min-width: 700px) {
+    width: 18px;
+    height: 18px;
+  }
 `;

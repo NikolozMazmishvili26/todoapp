@@ -1,54 +1,63 @@
 import styled from "styled-components";
 
 // import assets
-import logo from "../../assets/logo.png";
-import moon from "../../assets/moon.png";
+import moon from "../../assets/icon-moon.svg";
+import sun from "../../assets/icon-sun.svg";
 
-function Header() {
+interface HeaderProps {
+  isDarkMode: boolean;
+  setIsDarkMode: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+function Header({ isDarkMode, setIsDarkMode }: HeaderProps) {
   return (
-    <HeaderContainer>
-      <HeadeLogo src={logo} alt="logo" />
-      <LogoTitle>TODO</LogoTitle>
-      <BgColorSwitcherImage src={moon} alt="switcherImage" />
-    </HeaderContainer>
+    <TodoHeader>
+      <HeaderTitle>todo</HeaderTitle>
+      {isDarkMode ? (
+        <BgColorSwitcherImage
+          src={sun}
+          alt="bgColorSwitcher"
+          onClick={() => setIsDarkMode(false)}
+        />
+      ) : (
+        <BgColorSwitcherImage
+          src={moon}
+          alt="bgColorSwitcher"
+          onClick={() => setIsDarkMode(true)}
+        />
+      )}
+    </TodoHeader>
   );
 }
 
 export default Header;
 
-const HeaderContainer = styled.div`
+const TodoHeader = styled.header`
   width: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 `;
 
-const HeadeLogo = styled.img`
-  @media screen and (min-width: 850px) {
-    display: none;
-  }
-`;
+const HeaderTitle = styled.h2`
+  font-size: 1.5rem;
+  letter-spacing: 15px;
+  text-transform: uppercase;
+  color: #fff;
+  line-height: 20px;
+  font-weight: 700;
 
-const LogoTitle = styled.h2`
-  display: none;
-  @media screen and (min-width: 850px) {
-    display: block;
-    font-style: normal;
-    font-weight: 700;
+  @media screen and (min-width: 700px) {
     font-size: 40px;
     line-height: 40px;
     letter-spacing: 15px;
-    color: #ffffff;
   }
 `;
 
 const BgColorSwitcherImage = styled.img`
-  cursor: pointer;
-  object-fit: cover;
-  width: 20px;
   height: 20px;
-  @media screen and (min-width: 850px) {
-    width: 26px;
+  cursor: pointer;
+  @media screen and (min-width: 700px) {
     height: 26px;
   }
 `;
